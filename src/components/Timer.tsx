@@ -56,7 +56,7 @@ export default function Timer() {
     }, []);
 
     return (
-        <div className="flex flex-row items-center gap-10">
+        <div className="flex flex-col md:flex-row items-center gap-10">
             <div className="flex flex-col items-center space-y-4">
                 <div className="text-4xl font-mono">{formatTime(time)}</div>
                 <div className="flex space-x-2">

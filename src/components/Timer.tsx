@@ -15,14 +15,23 @@ export default function Timer() {
 
     useEffect(() => {
         const repIntervalSeconds = parseFloat(repIntervalInput);
-        if (running && !isNaN(repIntervalSeconds)) {
+        const repIntervalMs = repIntervalSeconds * 1000;
+
+        if (running) {
+            // Initialize lastRepTimeRef if not set
+            if (lastRepTimeRef.current === undefined) {
+                lastRepTimeRef.current = time;
+            }
+
             intervalRef.current = window.setInterval(() => {
                 setTime((prevTime) => {
                     const newTime = prevTime + 10;
 
-                    const repIntervalMs = repIntervalSeconds * 1000;
-
-                    if (lastRepTimeRef.current && repIntervalMs > 0 && newTime - lastRepTimeRef.current >= repIntervalMs) {
+                    if (
+                        !isNaN(repIntervalSeconds) &&
+                        repIntervalMs > 0 &&
+                        newTime - lastRepTimeRef.current >= repIntervalMs
+                    ) {
                         setRepCount((prev) => prev + 1);
                         lastRepTimeRef.current = newTime;
                     }
@@ -37,8 +46,7 @@ export default function Timer() {
         return () => {
             if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [running, repIntervalInput]);
-
+    }, [running, repIntervalInput, time]);
 
     const formatTime = useCallback((ms: number) => {
         const minutes = Math.floor(ms / 60000);
@@ -54,6 +62,7 @@ export default function Timer() {
         }
         setRunning(false);
         setTime(0);
+        lastRepTimeRef.current = undefined;
     }, [running, time]);
 
     const clearAll = useCallback(() => {
@@ -61,6 +70,7 @@ export default function Timer() {
         setTime(0);
         setRepCount(0);
         setLaps([]);
+        lastRepTimeRef.current = undefined;
     }, []);
 
     const decrementRepCount = useCallback(() => {

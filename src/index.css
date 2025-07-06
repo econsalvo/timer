@@ -46,6 +46,9 @@ h1 {
     [&::-webkit-inner-spin-button]:appearance-none
     [&::-webkit-outer-spin-button]:appearance-none;
 }
+.input-addon:disabled {
+  @apply bg-gray-950 border-gray-600 text-gray-400 cursor-not-allowed;
+}
 .default-btn:hover {
   border-color: #646cff;
 }

@@ -27,11 +27,7 @@ export default function Timer() {
                 setTime((prevTime) => {
                     const newTime = prevTime + 10;
 
-                    if (
-                        !isNaN(repIntervalSeconds) &&
-                        repIntervalMs > 0 &&
-                        newTime - lastRepTimeRef.current >= repIntervalMs
-                    ) {
+                    if (!isNaN(repIntervalSeconds) && repIntervalMs > 0 && lastRepTimeRef.current !== undefined && newTime - lastRepTimeRef.current >= repIntervalMs) {
                         setRepCount((prev) => prev + 1);
                         lastRepTimeRef.current = newTime;
                     }
@@ -107,6 +103,7 @@ export default function Timer() {
                 <div className="flex items-center space-x-2 gap-6">
                     <input
                         type="number"
+                        disabled={running}
                         min="1"
                         value={repIntervalInput}
                         onChange={(e) => setRepIntervalInput(e.target.value)}

@@ -1,4 +1,4 @@
-import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react';
+import { Minus, Pause, Play, Plus, Repeat, RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import LapTimes from './LapTimes';
 
@@ -7,26 +7,38 @@ export default function Timer() {
     const [running, setRunning] = useState(false);
     const [repCount, setRepCount] = useState(0);
     const [laps, setLaps] = useState<number[]>([]);
+    const [repIntervalInput, setRepIntervalInput] = useState<string>("0");
+    const lastRepTimeRef = useRef<number>(undefined);
+
 
     const intervalRef = useRef<number | null>(null);
 
     useEffect(() => {
-        if (running) {
+        const repIntervalSeconds = parseFloat(repIntervalInput);
+        if (running && !isNaN(repIntervalSeconds)) {
             intervalRef.current = window.setInterval(() => {
-                setTime((prev) => prev + 10);
+                setTime((prevTime) => {
+                    const newTime = prevTime + 10;
+
+                    const repIntervalMs = repIntervalSeconds * 1000;
+
+                    if (lastRepTimeRef.current && repIntervalMs > 0 && newTime - lastRepTimeRef.current >= repIntervalMs) {
+                        setRepCount((prev) => prev + 1);
+                        lastRepTimeRef.current = newTime;
+                    }
+
+                    return newTime;
+                });
             }, 10);
         } else {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
+            if (intervalRef.current) clearInterval(intervalRef.current);
         }
 
         return () => {
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current);
-            }
+            if (intervalRef.current) clearInterval(intervalRef.current);
         };
-    }, [running]);
+    }, [running, repIntervalInput]);
+
 
     const formatTime = useCallback((ms: number) => {
         const minutes = Math.floor(ms / 60000);
@@ -60,27 +72,43 @@ export default function Timer() {
             <div className="flex flex-col items-center space-y-4">
                 <div className="text-4xl font-mono">{formatTime(time)}</div>
                 <div className="flex space-x-2">
-                    <button className="px-4 py-2 text-white rounded" onClick={() => setRunning(true)} disabled={running}>
+                    <button className="default-btn" onClick={() => setRunning(true)} disabled={running}>
                         <Play />
                     </button>
-                    <button className="px-4 py-2 text-white rounded" onClick={() => setRunning(false)} disabled={!running}>
+                    <button className="default-btn" onClick={() => setRunning(false)} disabled={!running}>
                         <Pause />
                     </button>
-                    <button className="px-4 py-2 text-white rounded" onClick={() => resetTimer()}>
+                    <button className="default-btn" onClick={() => resetTimer()}>
                         <RotateCcw />
                     </button>
                 </div>
                 <div className="text-4xl font-mono">{repCount}</div>
                 <div className="flex space-x-2">
-                    <button className="flex px-4 py-2 text-white rounded" onClick={() => setRepCount(prev => prev + 1)} >
+                    <button className="default-btn" onClick={() => setRepCount(prev => prev + 1)} >
                         <Plus />
                     </button>
-                    <button className="flex px-4 py-2 text-white rounded" onClick={decrementRepCount} >
+                    <button className="default-btn" onClick={decrementRepCount} >
                         <Minus />
                     </button>
-                    <button className="flex px-4 py-2 text-white rounded" onClick={clearAll} >
+                    <button className="default-btn" onClick={clearAll} >
                         Clear
                     </button>
+                </div>
+                <div className="flex items-center space-x-2 gap-6">
+                    <input
+                        type="number"
+                        min="1"
+                        value={repIntervalInput}
+                        onChange={(e) => setRepIntervalInput(e.target.value)}
+                        className="input-addon"
+                    />
+                    <span className="input-addon">sec</span>
+                    <label className="text-white">
+                        <Repeat
+                            className="text-white hover:text-[#535bf2] cursor-pointer transition-colors duration-200"
+                            onClick={() => setRepIntervalInput("")}
+                        />
+                    </label>
                 </div>
             </div>
             <LapTimes laps={laps} formatTime={formatTime} />

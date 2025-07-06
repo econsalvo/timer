@@ -1,4 +1,4 @@
-import { Minus, Plus, RotateCcw } from 'lucide-react';
+import { Minus, Pause, Play, Plus, RotateCcw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import LapTimes from './LapTimes';
 
@@ -61,10 +61,10 @@ export default function Timer() {
                 <div className="text-4xl font-mono">{formatTime(time)}</div>
                 <div className="flex space-x-2">
                     <button className="px-4 py-2 text-white rounded" onClick={() => setRunning(true)} disabled={running}>
-                        Play
+                        <Play />
                     </button>
                     <button className="px-4 py-2 text-white rounded" onClick={() => setRunning(false)} disabled={!running}>
-                        Stop
+                        <Pause />
                     </button>
                     <button className="px-4 py-2 text-white rounded" onClick={() => resetTimer()}>
                         <RotateCcw />
